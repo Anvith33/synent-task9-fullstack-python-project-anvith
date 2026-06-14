@@ -76,7 +76,7 @@ synent-task9-fullstack-python-project-anvith
 
 └── static
 
-|   └── style.css
+|    └── style.css
 
 Register link:
 
