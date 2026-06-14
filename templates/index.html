@@ -6,14 +6,15 @@
 <body>
     <h1>Task Manager</h1>
 
-    <form>
-        <input type="text" placeholder="Enter a task">
+    <form method="POST">
+        <input type="text" name="task"placeholder="Enter a task">
         <button type="submit">Add Task</button>
     </form>
 
     <ul>
-        <li>Learn Flask</li>
-        <li>Complete Internship</li>
+         {% for task in tasks %}
+    <li>{{ task[0] }}</li>
+{% endfor %}
     </ul>
 </body>
 </html>
