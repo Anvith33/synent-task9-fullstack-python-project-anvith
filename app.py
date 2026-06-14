@@ -9,11 +9,13 @@ def init_db():
     cursor = conn.cursor()
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS tasks (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            task TEXT NOT NULL
-        )
-    """)
+    CREATE TABLE IF NOT EXISTS tasks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task TEXT NOT NULL,
+        due_date TEXT,
+        status TEXT DEFAULT 'Pending'
+    )
+""")
 
     conn.commit()
     conn.close()
@@ -25,15 +27,15 @@ def home():
 
     if request.method == "POST":
         task = request.form.get("task")
+        due_date = request.form.get("due_date")
+
 
         if task:
             conn = sqlite3.connect("tasks.db")
             cursor = conn.cursor()
 
-            cursor.execute(
-                "INSERT INTO tasks (task) VALUES (?)",
-                (task,)
-            )
+            cursor.execute("INSERT INTO tasks (task, due_date) VALUES (?, ?)",
+    (task, due_date))
 
             conn.commit()
             conn.close()
@@ -41,7 +43,7 @@ def home():
     conn = sqlite3.connect("tasks.db")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT id, task FROM tasks")
+    cursor.execute("SELECT id, task, due_date, status FROM tasks")
     tasks = cursor.fetchall()
 
     conn.close()

@@ -6,21 +6,32 @@
 </head>
 <body>
     <h1>Task Manager</h1>
-
     <form method="POST">
-        <input type="text" name="task"placeholder="Enter a task">
-        <button type="submit">Add Task</button>
-    </form>
+    <input type="text"
+           name="task"
+           placeholder="Enter a task"
+           required>
 
+    <input type="date"
+           name="due_date"
+           required>
+
+    <button type="submit">Add Task</button>
+</form>
     <ul>
     {% for task in tasks %}
         <li>
-            {{ task[1] }}
+            <div>
+                <strong>{{ task[1] }}</strong><br>
+                Due Date: {{ task[2] }}<br>
+                Status: {{ task[3] }}
+            </div>
+
             <a href="/delete/{{ task[0] }}">
                 <button>Delete</button>
             </a>
         </li>
     {% endfor %}
-</ul>
+    </ul>
 </body>
 </html>
