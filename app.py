@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 import sqlite3
 
 app = Flask(__name__)
+app.secret_key = "taskmanager_secret_key"
 
 # Create database and table
 def init_db():
@@ -14,6 +15,14 @@ def init_db():
         task TEXT NOT NULL,
         due_date TEXT,
         status TEXT DEFAULT 'Pending'
+    )
+""")
+    
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL
     )
 """)
 
@@ -119,6 +128,71 @@ def edit_task(id):
         "edit.html",
         task=task
     )
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+
+    if request.method == "POST":
+
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        conn = sqlite3.connect("tasks.db")
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            INSERT INTO users (username, password)
+            VALUES (?, ?)
+            """,
+            (username, password)
+        )
+
+        conn.commit()
+        conn.close()
+
+        return "User Registered Successfully"
+
+    return render_template("register.html")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    if request.method == "POST":
+
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        conn = sqlite3.connect("tasks.db")
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT id
+            FROM users
+            WHERE username=? AND password=?
+            """,
+            (username, password)
+        )
+
+        user = cursor.fetchone()
+
+        conn.close()
+
+        if user:
+            session["user_id"] = user[0]
+            return redirect("/")
+
+        return "Invalid Username or Password"
+
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+
+    session.clear()
+
+    return redirect("/login")
 
 if __name__ == "__main__":
     app.run(debug=True)
