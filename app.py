@@ -14,7 +14,8 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         task TEXT NOT NULL,
         due_date TEXT,
-        status TEXT DEFAULT 'Pending'
+        status TEXT DEFAULT 'Pending',
+        user_id INTEGER
     )
 """)
     
@@ -43,16 +44,20 @@ def home():
             conn = sqlite3.connect("tasks.db")
             cursor = conn.cursor()
 
-            cursor.execute("INSERT INTO tasks (task, due_date) VALUES (?, ?)",
-    (task, due_date))
-
+            cursor.execute("""INSERT INTO tasks(task, due_date, user_id)
+    VALUES (?, ?, ?)
+    """,(task,due_date,session["user_id"])
+)
             conn.commit()
             conn.close()
 
     conn = sqlite3.connect("tasks.db")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT id, task, due_date, status FROM tasks")
+    cursor.execute(
+    """
+    SELECT id, task, due_date, status FROM tasks WHERE user_id=? """, (session["user_id"],)
+)
     tasks = cursor.fetchall()
 
     conn.close()
