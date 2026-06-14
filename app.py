@@ -35,6 +35,9 @@ init_db()
 @app.route("/", methods=["GET", "POST"])
 def home():
 
+    if "user_id" not in session:
+        return redirect("/login")
+
     if request.method == "POST":
         task = request.form.get("task")
         due_date = request.form.get("due_date")
@@ -156,7 +159,7 @@ def register():
         conn.commit()
         conn.close()
 
-        return "User Registered Successfully"
+        return redirect("/login")
 
     return render_template("register.html")
 
