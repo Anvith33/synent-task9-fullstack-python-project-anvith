@@ -81,5 +81,44 @@ def delete_task(id):
 
     return redirect("/")
 
+@app.route("/edit/<int:id>", methods=["GET", "POST"])
+def edit_task(id):
+
+    conn = sqlite3.connect("tasks.db")
+    cursor = conn.cursor()
+
+    if request.method == "POST":
+
+        task = request.form.get("task")
+        due_date = request.form.get("due_date")
+
+        cursor.execute(
+            """
+            UPDATE tasks
+            SET task=?, due_date=?
+            WHERE id=?
+            """,
+            (task, due_date, id)
+        )
+
+        conn.commit()
+        conn.close()
+
+        return redirect("/")
+
+    cursor.execute(
+        "SELECT id, task, due_date, status FROM tasks WHERE id=?",
+        (id,)
+    )
+
+    task = cursor.fetchone()
+
+    conn.close()
+
+    return render_template(
+        "edit.html",
+        task=task
+    )
+
 if __name__ == "__main__":
     app.run(debug=True)
